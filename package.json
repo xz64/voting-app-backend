@@ -1,0 +1,31 @@
+{
+  "name": "voting-app-backend",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "eslint '**/*.js'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "S K (xz64)",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "bunyan": "^1.8.1",
+    "convict": "^1.4.0",
+    "es6-promise": "^3.2.1",
+    "koa": "^1.2.1",
+    "koa-bodyparser": "^2.2.0",
+    "koa-router": "^5.4.0",
+    "mongoose": "^4.5.8",
+    "recaptcha-validator": "^1.0.9"
+  },
+  "devDependencies": {
+    "eslint": "^3.3.1",
+    "eslint-plugin-node": "^2.0.0"
+  },
+  "engines": {
+    "node": "^6.2.1"
+  }
+}
