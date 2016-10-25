@@ -15,6 +15,7 @@
     "bunyan": "^1.8.1",
     "convict": "^1.4.0",
     "es6-promise": "^3.2.1",
+    "http-status-codes": "^1.0.6",
     "jsonwebtoken": "^7.1.9",
     "koa": "^1.2.1",
     "koa-bodyparser": "^2.2.0",
