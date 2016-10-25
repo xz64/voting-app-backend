@@ -2,12 +2,15 @@
 
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+
 var SALT_WORK_FACTOR = 10;
 var MAX_LOGIN_ATTEMPTS = 5;
 var LOCK_TIME = 2 * 60 * 60 * 1000;
+var JWT_SECRET = require('../config.js').get('auth.secret');
 
 var userSchema = mongoose.Schema({
-  email: { type : String, unique: true, index: true, required: true,
+  username: { type : String, unique: true, index: true, required: true,
     lowercase: true, trim: true },
   password: { type: String, required: true },
   loginAttempts: { type: Number, required: true, default: 0 },
@@ -20,9 +23,9 @@ userSchema.virtual('isLocked').get(function() {
 });
 
 var reasons = userSchema.statics.failedLogin = {
-  NOT_FOUND: 0,
-  PASSWORD_INCORRECT: 1,
-  MAX_ATTEMPTS: 2
+  NOT_FOUND: new Error('User or password incorrect'),
+  PASSWORD_INCORRECT: new Error('User or password incorrect'),
+  MAX_ATTEMPTS: new Error('Account has been locked')
 };
 
 userSchema.pre('save', function(next) {
@@ -70,13 +73,44 @@ userSchema.methods.incLoginAttempts = function(cb) {
   return this.update(updates, cb);
 };
 
+userSchema.statics.getAuthToken = function(username) {
+  return new Promise(function(resolve, reject) {
+    jwt.sign({sub: username}, JWT_SECRET, { expiresIn: '15m' },
+      function(err, token) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(token);
+        }
+      });
+  });
+};
+
+userSchema.statics.login = function(username, password) {
+  var self = this;
+  var checkPassword = new Promise(function(resolve, reject) {
+    self.getAuthenticated(username, password, function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+
+  return checkPassword.then(function() {
+    return self.getAuthToken(username);
+  });
+
+};
+
 userSchema.statics.getAuthenticated = function(username, password, cb) {
   this.findOne({ username: username }, function(err, user) {
     if (err) return cb(err);
 
     // make sure the user exists
     if (!user) {
-      return cb(null, null, reasons.NOT_FOUND);
+      return cb(reasons.NOT_FOUND, null, reasons.NOT_FOUND);
     }
 
     // check if the account is currently locked
@@ -84,7 +118,7 @@ userSchema.statics.getAuthenticated = function(username, password, cb) {
       // just increment login attempts if account is already locked
       return user.incLoginAttempts(function(err) {
         if (err) return cb(err);
-        return cb(null, null, reasons.MAX_ATTEMPTS);
+        return cb(reasons.MAX_ATTEMPTS, null, reasons.MAX_ATTEMPTS);
       });
     }
 
@@ -110,7 +144,7 @@ userSchema.statics.getAuthenticated = function(username, password, cb) {
       // password is incorrect, so increment login attempts before responding
       user.incLoginAttempts(function(err) {
         if (err) return cb(err);
-        return cb(null, null, reasons.PASSWORD_INCORRECT);
+        return cb(reasons.PASSWORD_INCORRECT, null, reasons.PASSWORD_INCORRECT);
       });
     });
   });

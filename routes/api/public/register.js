@@ -3,8 +3,8 @@
 var Router = require('koa-router');
 var recaptchaValidator = require('recaptcha-validator');
 
-var recaptchaSecretKey = require('../../config').get('recaptcha.secretKey');
-var User = require('../../models/user');
+var recaptchaSecretKey = require('../../../config').get('recaptcha.secretKey');
+var User = require('../../../models/user');
 
 var router = new Router();
 
@@ -13,7 +13,7 @@ router.post('/register', function* () {
   yield recaptchaValidator.promise(recaptchaSecretKey, body.captcharesponse,
     true);
   var user = new User({
-    email: body.email,
+    username: body.email,
     password: body.password
   });
   yield user.save();

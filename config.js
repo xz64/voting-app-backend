@@ -30,6 +30,13 @@ var config = convict({
       default: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
       env: 'RECAPTCHA_SECRET_KEY'
     }
+  },
+  auth: {
+    secret: {
+      doc: 'the JWT secret signing key',
+      default: 'test',
+      env: 'JWT_SECRET_KEY'
+    }
   }
 });
 
