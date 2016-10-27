@@ -10,4 +10,7 @@ router.use('', register.routes(), register.allowedMethods());
 var login = require('./login');
 router.use('', login.routes(), login.allowedMethods());
 
+var logout = require('./logout');
+router.use('', logout.routes(), logout.allowedMethods());
+
 module.exports = router;

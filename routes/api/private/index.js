@@ -19,4 +19,7 @@ router.use(function* (next) {
 var privateRoute = require('./privateRoute');
 router.use('', privateRoute.routes(), privateRoute.allowedMethods());
 
+var whoamiRoute = require('./whoamiRoute');
+router.use('', whoamiRoute.routes(), whoamiRoute.allowedMethods());
+
 module.exports = router;

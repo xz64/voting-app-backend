@@ -16,7 +16,7 @@ router.post('/login', function* () {
   }
   var token = yield User.login(username, password);
   this.cookies.set('authToken', token);
-  this.body = {};
+  this.body = { username: username };
 });
 
 module.exports = router;
