@@ -1,0 +1,165 @@
+swagger: '2.0'
+info:
+  title: Voting App API
+  description: API for the voting app.
+  version: "1.0.0"
+host: xz64-voting-app-backend.herokuapp.com
+schemes:
+  - https
+securityDefinitions:
+  CSRFProtection:
+    type: apiKey
+    in: header
+    name: X-Requested-With
+    description: Set to XMLHttpRequest
+security:
+  - CSRFProtection: []
+basePath: /api
+produces:
+  - application/json
+paths:
+  /polls:
+    get:
+      summary: List Polls
+      description: |
+        This will give the list of all polls, their options, and the vote count of each option.
+      parameters:
+        - name: mine
+          in: query
+          description: Include all polls or only those that the authenticated user created
+          required: false
+          type: boolean
+          default: false
+      tags:
+        - Polls
+      responses:
+        200:
+          description: An array of polls
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Poll'
+    post:
+      summary: Create poll
+      description: |
+        This will allow a poll to be created
+      parameters:
+        - name: poll
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PollCreate'
+      tags:
+        - Polls
+      responses:
+        200:
+          description: Returned if the poll was successfully created
+          schema: {}
+  /polls/{id}:
+    delete:
+      summary: Delete poll
+      description: This will allow a poll to be deleted. Users can only delete polls which they created.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Polls
+      responses:
+        200:
+          description: Empty Object
+          schema: {}
+        400:
+          description: May be returned if poll id is invalid or the user does not own the poll being deleted.
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: Update poll
+      description: This will allow a user's poll to be updated. All votes will be reset once the poll is updated.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: poll
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PollCreate'
+      tags:
+        - Polls
+      responses:
+        200:
+          description: Empty Object
+          schema: {}
+        400:
+          description: May be returned if poll id is invalid or the user does not own the poll being updated.
+          schema:
+            $ref: '#/definitions/Error'
+  /polls/{id}/vote/{optionId}:
+    post:
+      summary: Vote on a poll
+      description: This allows a user / non-user to vote on a poll. Non-users are tracked by IP address and users are tracked by their internal user ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: optionId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Polls
+      responses:
+        200:
+          description: Empty Object
+          schema: {}
+        400:
+          description: Returned if poll id is invalid, answer id is invalid, or if the user/non-user has already voted on the poll.
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Poll:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Internal ID for this poll
+      owner:
+        type: string
+        description: Internal ID of the user who created this poll
+      question:
+        type: string
+        description: The question the poll is asking
+      answers:
+        type: array
+        items:
+          $ref: '#/definitions/Answer'
+  PollCreate:
+    type: object
+    properties:
+      question:
+        type: string
+        description: The question the poll is asking
+      answers:
+        type: array
+        description: Possible answers
+        items:
+          type: string
+  Answer:
+    type: object
+    properties:
+      text:
+        type: string
+        description: text for this answer
+      voteCount:
+        type: integer
+        description: Number of votes this answer received
+  Error:
+    type: object
+    properties:
+      error:
+        description: Message key which can be localized by the client
+        type: string

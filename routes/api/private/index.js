@@ -22,4 +22,7 @@ router.use('', privateRoute.routes(), privateRoute.allowedMethods());
 var whoamiRoute = require('./whoamiRoute');
 router.use('', whoamiRoute.routes(), whoamiRoute.allowedMethods());
 
+var pollRoute = require('./polls');
+router.use('', pollRoute.routes(), pollRoute.allowedMethods());
+
 module.exports = router;

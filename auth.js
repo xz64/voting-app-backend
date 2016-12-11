@@ -1,5 +1,6 @@
 var passport = require('koa-passport');
 var JwtStrategy = require('passport-jwt').Strategy;
+var AnonymousStrategy = require('passport-anonymous').Strategy;
 
 var User = require('./models/user');
 var JWT_SECRET = require('./config').get('auth.secret');
@@ -19,5 +20,6 @@ module.exports = [
     .catch(function() {
       return done(null, false);
     })
-  })
+  }),
+  new AnonymousStrategy()
 ]
