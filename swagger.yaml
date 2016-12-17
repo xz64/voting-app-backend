@@ -56,6 +56,24 @@ paths:
           description: Returned if the poll was successfully created
           schema: {}
   /polls/{id}:
+    get:
+      summary: Find poll
+      description: search for poll by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Polls
+      responses:
+        200:
+          description: Returned if poll is found
+          schema:
+            $ref: '#/definitions/Poll'
+        400:
+          description: May be returned if poll id is invalid
+          schema: {}  
     delete:
       summary: Delete poll
       description: This will allow a poll to be deleted. Users can only delete polls which they created.
@@ -151,6 +169,9 @@ definitions:
   Answer:
     type: object
     properties:
+      id:
+        type: string
+        description: internal ID for this answer
       text:
         type: string
         description: text for this answer

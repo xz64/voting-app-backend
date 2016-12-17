@@ -9,6 +9,21 @@ var Poll = require('../../../models/poll');
 
 var router = new Router();
 
+function pollMap(poll) {
+  return {
+    id: poll._id,
+    question: poll.question,
+    owner: poll.owner,
+    answers: poll.answers.map(function(answer) {
+      return {
+        id: answer._id,
+        text: answer.answer,
+        voteCount: answer.votes.length
+      };
+    })
+  };
+}
+
 router.get('/polls', function* () {
   var mineOnly = this.request.query.mine === "true";
   var searchOptions = {};
@@ -25,19 +40,21 @@ router.get('/polls', function* () {
 
   polls = yield Poll.find(searchOptions).exec();
 
-  this.body = polls.map(function(poll) {
-    return {
-      id: poll._id,
-      question: poll.question,
-      owner: poll.owner,
-      answers: poll.answers.map(function(answer) {
-        return {
-          text: answer.answer,
-          voteCount: answer.votes.length
-        };
-      })
-    }
-  });
+  this.body = polls.map(pollMap);
+});
+
+router.get('/polls/:id', function* () {
+  var poll;
+
+  try {
+    poll = yield Poll.findById(this.params.id).exec();
+  } catch (e) {
+    this.response.status = HttpStatus.BAD_REQUEST;
+    this.body = {};
+    return;
+  }
+
+  this.body = pollMap(poll);
 });
 
 router.post('/polls/:id/vote/:optionId', function* () {
@@ -61,7 +78,7 @@ router.post('/polls/:id/vote/:optionId', function* () {
   }
 
   if (user) {
-    voterId = user._id;
+    voterId = user._id.toString();
   } else {
     voterId = (this.request.headers['X-Forwarded-For'] || this.request.ip);
   }
