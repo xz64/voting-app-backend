@@ -39,6 +39,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Poll'
+        401:
+          description: May be returned if ?mine=true and the user is not logged in.
+          schema:
+            $ref: '#/definitions/Error'
     post:
       summary: Create poll
       description: |

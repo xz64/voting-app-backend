@@ -30,6 +30,7 @@ router.get('/polls', function* () {
   var polls;
 
   if (!this.req.user && mineOnly) {
+    this.response.status = HttpStatus.UNAUTHORIZED;
     this.body = { error: errors['NOT_LOGGED_IN'] };
     return;
   }
