@@ -21,7 +21,7 @@ var config = convict({
     mongoURI: {
       doc: 'the mongodb:// URI',
       default: 'mongodb://localhost:27017/voting',
-      env: 'MONGOLAB_URI'
+      env: 'MONGODB_URI'
     }
   },
   recaptcha: {
