@@ -1,3 +1,7 @@
+// much of the code here was taken from 
+// http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
+// and http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
+// and http://devsmash.com/blog/implementing-max-login-attempts-with-mongoose
 'use strict';
 
 var mongoose = require('mongoose');
